@@ -8,6 +8,7 @@ import os
 from timeit import default_timer as timer
 
 import numpy as np
+import pandas as pd
 import tensorflow.compat.v1 as tf
 from tensorflow.python.keras import backend as K
 from keras.models import load_model
@@ -126,7 +127,7 @@ class YOLO(object):
                 self.input_image_shape: [image.size[1], image.size[0]],
                 K.learning_phase(): 0
             })
-        # TODO: if found at least 1 box, add to dataframe
+        # TODO: if found at least 1 box, add to list
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
         font = ImageFont.truetype(font='font/FiraMono-Medium.otf',
@@ -147,7 +148,8 @@ class YOLO(object):
             left = max(0, np.floor(left + 0.5).astype('int32'))
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
-            # TODO: print label if applicable
+            
+            # TODO: store label in list if applicable
             print(label, (left, top), (right, bottom))
 
             if top - label_size[1] >= 0:
@@ -192,6 +194,8 @@ def detect_video(yolo, video_path, output_path=""):
     prev_time = timer()
     while True:
         return_value, frame = vid.read()
+        if frame is None:
+            break
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)
