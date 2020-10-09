@@ -1,9 +1,12 @@
 import sys
 import argparse
+import pandas as pd
+import numpy as np
 from yolo import YOLO, detect_video
 from PIL import Image
 
 def detect_img(yolo):
+    results = []
     while True:
         img = input('Input image filename:')
         try:
@@ -15,6 +18,22 @@ def detect_img(yolo):
             r_image = yolo.detect_image(image)
             r_image.show()
     yolo.close_session()
+    return results
+
+def parse(data, filepath):
+    results = {'Label': [], 'Confidence': [], 'Box': []}
+    if (len(data) == 0):
+        print("No objects detected")
+        return
+    data = np.array(data)
+    labels = data[:, 0]
+    scores = data[:, 1]
+    boxes = data[:, 2]
+    results['Label'] = labels
+    results['Confidence'] = scores
+    results['Box'] = boxes
+    df = pd.DataFrame(results)
+    df.to_csv(filepath)
 
 FLAGS = None
 
@@ -61,6 +80,11 @@ if __name__ == '__main__':
         help = "[Optional] Video output path"
     )
 
+    parser.add_argument(
+        "--csv", nargs='?', type=str, required = False, default="",
+        help = "CSV file path"
+    )
+
     FLAGS = parser.parse_args()
 
     if FLAGS.image:
@@ -70,8 +94,13 @@ if __name__ == '__main__':
         print("Image detection mode")
         if "input" in FLAGS:
             print(" Ignoring remaining command line arguments: " + FLAGS.input + "," + FLAGS.output)
-        detect_img(YOLO(**vars(FLAGS)))
+        results = detect_img(YOLO(**vars(FLAGS)))
     elif "input" in FLAGS:
-        detect_video(YOLO(**vars(FLAGS)), FLAGS.input, FLAGS.output)
+        print(FLAGS.csv)
+        if FLAGS.csv != "":
+            results = detect_video(YOLO(**vars(FLAGS)), FLAGS.input, FLAGS.output)
+            parse(results, FLAGS.csv)
+        else:
+            detect_video(YOLO(**vars(FLAGS)), FLAGS.input, FLAGS.output)
     else:
         print("Must specify at least video_input_path.  See usage with --help.")
