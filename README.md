@@ -1,7 +1,7 @@
 # tiny-yolo
 
 ## Overview
-This code is a bare minimum version of [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3). It only runs Tini YOLOv3 on images and videos and does not provide support for custom training.
+This code is a bare minimum version of [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3). It only runs Tini YOLOv3 on images and videos and does not provide support for custom training. Additionally, changes were made to use Tensorflow 2.
 
 The script returns a list of (label, confidence, bounding box coordinates) items. There is also an option to write these to a csv file and a script that provides some post-processing functionality for the results.
 
