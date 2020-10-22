@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest
+FROM honghu/keras
 
 RUN apt-get update && yes | apt-get upgrade
 RUN apt-get install -y git python
