@@ -1,9 +1,9 @@
-FROM honghu/keras:tf-latest
+FROM tensorflow/tensorflow:latest
 
 RUN apt-get update && yes | apt-get upgrade
 RUN apt-get install -y git python
 RUN pip install --upgrade pip
-RUN pip install pandas
+RUN pip install pandas keras
 
 RUN git clone https://github.com/apurl1/tiny-yolo.git
 ADD *.py ./
