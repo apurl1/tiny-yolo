@@ -1,4 +1,4 @@
-FROM honghu/keras
+FROM honghu/keras:tf-latest
 
 RUN apt-get update && yes | apt-get upgrade
 RUN apt-get install -y git python
