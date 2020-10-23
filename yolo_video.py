@@ -7,16 +7,19 @@ from PIL import Image
 
 def detect_img(yolo):
     results = []
-    while True:
-        img = input('Input image filename:')
-        #try:
-            #image = Image.open(img)
-        #except:
-            #print('Open Error! Try again!')
-            #continue
-        #else:
-        r_image = yolo.detect_image(image)
-            #r_image.show()
+    i = 0
+    while i < 1:
+        #img = input('Input image filename:')
+        img = 'data/images/Trial1_Right-051.jpeg'
+        try:
+            image = Image.open(img)
+        except:
+            print('Open Error! Try again!')
+            continue
+        else:
+            r_image = yolo.detect_image(image)
+            r_image.show()
+        i += 1
     yolo.close_session()
     return results
 
