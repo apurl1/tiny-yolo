@@ -178,6 +178,7 @@ class YOLO(object):
         self.sess.close()
 
 def detect_video(yolo, video_path, output_path=""):
+    print("Starting detection")
     import cv2
     vid = cv2.VideoCapture(video_path)
     print(video_path)
