@@ -182,8 +182,8 @@ def detect_video(yolo, video_path, output_path=""):
     import cv2
     vid = cv2.VideoCapture(video_path)
     print(video_path)
-    if not vid.isOpened():
-        raise IOError("Couldn't open webcam or video")
+    #if not vid.isOpened():
+    #    raise IOError("Couldn't open webcam or video")
     video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
     video_fps       = vid.get(cv2.CAP_PROP_FPS)
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
