@@ -8,9 +8,7 @@ import os
 from timeit import default_timer as timer
 
 import numpy as np
-import pandas as pd
-import tensorflow.compat.v1 as tf
-from tensorflow.python.keras import backend as K
+from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
@@ -20,14 +18,12 @@ from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
 
-tf.disable_eager_execution()
-
 class YOLO(object):
     _defaults = {
-        "model_path": 'model_data/yolo-tiny.h5',
+        "model_path": 'logs/trained_weights_final.h5',
         "anchors_path": 'model_data/tiny_yolo_anchors.txt',
-        "classes_path": 'model_data/coco_classes.txt',
-        "score" : 0.3,
+        "classes_path": 'model_data/voc_classes.txt',
+        "score" : 0.07,
         "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
@@ -46,7 +42,6 @@ class YOLO(object):
         self.class_names = self._get_class()
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
-        self.results = []
         self.boxes, self.scores, self.classes = self.generate()
 
     def _get_class(self):
@@ -140,35 +135,32 @@ class YOLO(object):
             box = out_boxes[i]
             score = out_scores[i]
 
-            if score >= 0.3 and (predicted_class == 'chair' or predicted_class == 'bench'):
-                label = '{} {:.2f}'.format(predicted_class, score)
-                draw = ImageDraw.Draw(image)
-                label_size = draw.textsize(label, font)
+            label = '{} {:.2f}'.format(predicted_class, score)
+            draw = ImageDraw.Draw(image)
+            label_size = draw.textsize(label, font)
 
-                top, left, bottom, right = box
-                top = max(0, np.floor(top + 0.5).astype('int32'))
-                left = max(0, np.floor(left + 0.5).astype('int32'))
-                bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
-                right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
-                
-                print(label, (left, top), (right, bottom))
-                self.results.append((predicted_class, score, ((left, top), (right, bottom))))
+            top, left, bottom, right = box
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
+            right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
+            print(label, (left, top), (right, bottom))
 
-                if top - label_size[1] >= 0:
-                    text_origin = np.array([left, top - label_size[1]])
-                else:
-                    text_origin = np.array([left, top + 1])
+            if top - label_size[1] >= 0:
+                text_origin = np.array([left, top - label_size[1]])
+            else:
+                text_origin = np.array([left, top + 1])
 
-                # My kingdom for a good redistributable image drawing library.
-                for i in range(thickness):
-                    draw.rectangle(
-                        [left + i, top + i, right - i, bottom - i],
-                        outline=self.colors[c])
+            # My kingdom for a good redistributable image drawing library.
+            for i in range(thickness):
                 draw.rectangle(
-                    [tuple(text_origin), tuple(text_origin + label_size)],
-                    fill=self.colors[c])
-                draw.text(text_origin, label, fill=(0, 0, 0), font=font)
-                del draw
+                    [left + i, top + i, right - i, bottom - i],
+                    outline=self.colors[c])
+            draw.rectangle(
+                [tuple(text_origin), tuple(text_origin + label_size)],
+                fill=self.colors[c])
+            draw.text(text_origin, label, fill=(0, 0, 0), font=font)
+            del draw
 
         end = timer()
         print(end - start)
@@ -178,12 +170,10 @@ class YOLO(object):
         self.sess.close()
 
 def detect_video(yolo, video_path, output_path=""):
-    print("Starting detection")
     import cv2
     vid = cv2.VideoCapture(video_path)
-    print(video_path)
-    #if not vid.isOpened():
-    #    raise IOError("Couldn't open webcam or video")
+    if not vid.isOpened():
+        raise IOError("Couldn't open webcam or video")
     video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
     video_fps       = vid.get(cv2.CAP_PROP_FPS)
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
@@ -198,8 +188,6 @@ def detect_video(yolo, video_path, output_path=""):
     prev_time = timer()
     while True:
         return_value, frame = vid.read()
-        if frame is None:
-            break
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)
@@ -215,10 +203,9 @@ def detect_video(yolo, video_path, output_path=""):
         cv2.putText(result, text=fps, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.50, color=(255, 0, 0), thickness=2)
         cv2.namedWindow("result", cv2.WINDOW_NORMAL)
-        # cv2.imshow("result", result)
+        cv2.imshow("result", result)
         if isOutput:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     yolo.close_session()
-    return yolo.results

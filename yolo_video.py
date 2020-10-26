@@ -8,9 +8,9 @@ from PIL import Image
 def detect_img(yolo):
     results = []
     i = 0
-    while i < 1:
-        #img = input('Input image filename:')
-        img = 'data/images/Trial1_Right-051.jpeg'
+    while True:
+        img = input('Input image filename:')
+        #img = 'data/images/Trial1_Right-051.jpeg'
         try:
             image = Image.open(img)
         except:
