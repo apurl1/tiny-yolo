@@ -9,8 +9,8 @@ def detect_img(yolo):
     results = []
     i = 0
     while True:
-        img = input('Input image filename:')
-        #img = 'data/images/Trial1_Right-051.jpeg'
+        #img = input('Input image filename:')
+        img = 'data/images/Trial1_Right-051.jpeg'
         try:
             image = Image.open(img)
         except:
