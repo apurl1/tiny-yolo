@@ -22,10 +22,10 @@ tf.disable_eager_execution()
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'logs/trained_weights_final.h5',
+        "model_path": 'logs/001/trained_weights_final.h5',
         "anchors_path": 'model_data/tiny_yolo_anchors.txt',
         "classes_path": 'model_data/voc_classes.txt',
-        "score" : 0.07,
+        "score" : 0.4,
         "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,

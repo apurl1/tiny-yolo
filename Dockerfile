@@ -18,4 +18,4 @@ RUN git clone https://github.com/apurl1/tiny-yolo.git
 WORKDIR /tiny-yolo
 ADD ${INPUT_PATH} ${INPUT_PATH}
 
-CMD git pull && python yolo_video.py --model ${MODEL_PATH} --anchors ${ANCHOR_PATH} --input ${INPUT_PATH} --output ${OUTPUT_PATH}
+CMD git pull && python yolo_video.py --model ${MODEL_PATH} --anchors ${ANCHOR_PATH} --image --input ${INPUT_PATH} --output ${OUTPUT_PATH}
