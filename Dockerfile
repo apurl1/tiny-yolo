@@ -1,6 +1,6 @@
 FROM tensorflow/tensorflow:latest
 
-ENV INPUT_PATH=data/videos/Trial1/1_right.mp4
+ENV INPUT_PATH=data/images/original/Trial1_Right-051.jpeg
 ENV OUTPUT_PATH=results/vidoes/1_right.mp4
 ENV MODEL_PATH=model_data/yolo-tiny.h5
 ENV ANCHOR_PATH=model_data/tiny_yolo_anchors.txt
@@ -10,7 +10,7 @@ RUN apt-get update && yes | apt-get upgrade
 RUN apt-get install 'ffmpeg'\
     'libsm6'\ 
     'libxext6'  -y
-RUN apt-get install -y git python x11-xserver-utils
+RUN apt-get install -y git python
 RUN pip install --upgrade pip
 RUN pip install pandas keras pillow matplotlib opencv-python==4.1.2.30
 
